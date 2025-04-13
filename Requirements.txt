@@ -1,0 +1,19 @@
+﻿
+### Requirements:
+- Different actors can log in/log out. A Customer can view products without logging in but can’t do anything further unless they log in.
+
+- Admin can manage *(accept or reject) new registered accounts (Vendor).*
+- Admin can *enable or disable some permissions* (features) for vendor role or individual vendors.
+- Admin can *accept or reject* posts written by the Vendor. If the product post is accepted, the post can appear for any customer.
+- Admin can enable permission for specific vendors, so that no need to accept their posts.
+
+- Customer can *view all posted products*. Customer can *search* for products based on criteria such as category, and price. 
+	includes: Vendor name, Title, Description, Price, images, Number of available units, Number of viewers (post readers).
+- Customer can purchase product as 1 unit or more.
+- Customer can *save* important posts.
+- Customer can’t purchase products that are out of stock (zero units).
+
+- Vendor can manage products (create, list, update, delete) *(CRUD)*.
+- Vendor can update number of units per product.
+- Vendor can view *history* of the customers purchased specific product.
+
