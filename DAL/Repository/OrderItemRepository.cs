@@ -2,7 +2,6 @@
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using Socialify.DAL.Repository;
 
 namespace Marketplace.DAL.Repository
 {
@@ -15,7 +14,7 @@ namespace Marketplace.DAL.Repository
             _dbContext = context;
         }
 
-        public async Task<IEnumerable<OrderItem>> GetOrderItemsWithDetails()
+        public async Task<IEnumerable<OrderItem>> GetOrderItemsWithDetailsAsync()
         {
             return await _dbContext.OrderItems
                 .Include(oi => oi.Product)
@@ -23,7 +22,7 @@ namespace Marketplace.DAL.Repository
                 .ToListAsync();
         }
 
-        public async Task<OrderItem> GetOrderItemByIdWithDetails(int orderItemId)
+        public async Task<OrderItem> GetOrderItemByIdWithDetailsAsync(int orderItemId)
         {
             return await _dbContext.OrderItems
                 .Include(oi => oi.Product)

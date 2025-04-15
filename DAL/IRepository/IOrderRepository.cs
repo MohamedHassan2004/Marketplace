@@ -4,6 +4,6 @@ namespace Marketplace.DAL.IRepository
 {
     public interface IOrderRepository : IRepo<Order>
     {
-        Task<Order> GetOrderByIdWithDetails(int orderId);
+        Task<Order> GetOrderByIdWithDetailsAsync(int orderId);
     }
 }

@@ -5,9 +5,9 @@ namespace Marketplace.DAL.IRepository
 {
     public interface IVendorRepository
     {
-        Task<bool> Update(Vendor vendor);
-        Task<Vendor> GetVendorWithPermissions(string vendorId);
-        Task<IEnumerable<Vendor>> GetAllVendors();
-        Task<Vendor> GetVendorById(string vendorId);
+        Task<bool> UpdateVendorAsync(Vendor vendor);
+        Task<Vendor> GetVendorWithPermissionsAsync(string vendorId);
+        Task<IEnumerable<Vendor>> GetAllVendorsAsync();
+        Task<Vendor> GetVendorByIdAsync(string vendorId);
     }
 }

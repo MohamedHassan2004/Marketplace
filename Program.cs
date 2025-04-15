@@ -55,6 +55,8 @@ namespace Marketplace
                     };
                 });
 
+            builder.Services.AddAutoMapper(typeof(Program));
+
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -66,6 +68,12 @@ namespace Marketplace
             builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            //builder.Services.AddScoped<ICategoryService, CategoryService>();
+            //builder.Services.AddScoped<IOrderService, OrderService>();
+            //builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
+            //builder.Services.AddScoped<IVendorService, VendorService>();
+
 
 
 
@@ -76,12 +84,13 @@ namespace Marketplace
 
             var app = builder.Build();
 
-            // 
+            // seed roles in database
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                 MarketplaceDbContextSeed.SeedRolesAsync(roleManager).Wait();
             }
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

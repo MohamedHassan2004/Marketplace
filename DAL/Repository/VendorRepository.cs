@@ -15,17 +15,17 @@ namespace Marketplace.DAL.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Vendor>> GetAllVendors()
+        public async Task<IEnumerable<Vendor>> GetAllVendorsAsync()
         {
             return await _dbContext.Vendors.ToListAsync();
         }
 
-        public async Task<Vendor> GetVendorById(string vendorId)
+        public async Task<Vendor> GetVendorByIdAsync(string vendorId)
         {
             return await _dbContext.Vendors.FindAsync(vendorId);
         }
 
-        public async Task<Vendor> GetVendorWithPermissions(string vendorId)
+        public async Task<Vendor> GetVendorWithPermissionsAsync(string vendorId)
         {
             var vendor = await _dbContext.Vendors
                 .Include(v => v.Permissions)
@@ -34,7 +34,7 @@ namespace Marketplace.DAL.Repository
             return vendor;
         }
 
-        public async Task<bool> Update(Vendor vendor)
+        public async Task<bool> UpdateVendorAsync(Vendor vendor)
         {
             _dbContext.Vendors.Update(vendor);
             return await _dbContext.SaveChangesAsync() > 0;

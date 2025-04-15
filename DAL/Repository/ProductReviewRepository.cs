@@ -3,7 +3,6 @@ using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
 using Marketplace.DAL.Models.Users;
 using Microsoft.EntityFrameworkCore;
-using Socialify.DAL.Repository;
 
 namespace Marketplace.DAL.Repository
 {
@@ -15,7 +14,7 @@ namespace Marketplace.DAL.Repository
             _dbContext = context;
         }
 
-        public async Task<IEnumerable<ProductReview>> GetReviewsDetails()
+        public async Task<IEnumerable<ProductReview>> GetReviewsDetailsAsync()
         {
             return await _dbContext.ProductReviews
                 .Include(pr => pr.Customer)

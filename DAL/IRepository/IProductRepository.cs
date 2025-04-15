@@ -4,6 +4,23 @@ namespace Marketplace.DAL.IRepository
 {
     public interface IProductRepository : IRepo<Product>
     {
-        Task<Product> GetProductWithDetailsById(int Id);
+
+        // Customer + Vendor + Admin
+        Task<IEnumerable<Product>> GetAcceptedProductsAsync();
+        Task<IEnumerable<Product>> GetAcceptedProductsByVendorIdAsync(string vendorId);
+        Task<IEnumerable<Product>> GetProductsByPriceRangeAsync(decimal minPrice, decimal maxPrice);
+        Task<IEnumerable<Product>> GetProductsByCategoryNameAsync(string categoryName);
+        Task<Product> GetAcceptedProductByIdAsync(int productId);
+
+        // Admin
+        Task<IEnumerable<Product>> GetAllProductsAsync();
+        Task<IEnumerable<Product>> GetRejectedProductsAsync();
+        Task<IEnumerable<Product>> GetWaitingProductsAsync();
+
+        // Vendor + Admin
+        Task<IEnumerable<Product>> GetAllProductsByVendorIdAsync(string vendorId);
+        Task<IEnumerable<Product>> GetRejectedProductsByVendorIdAsync(string vendorId);
+        Task<IEnumerable<Product>> GetWaitingProductsByVendorIdAsync(string vendorId);
+        Task<Product> GetProductByIdAsync(int productId);
     }
 }

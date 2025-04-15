@@ -12,12 +12,15 @@ namespace Marketplace.DAL.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<IEnumerable<SavedProduct>> GetSavedProductsByCustomerIdAsync(string CustomerId)
+        public async Task<IEnumerable<Product>> GetSavedProductsByCustomerIdAsync(string CustomerId)
         {
             return await _dbContext.SavedProducts
                 .Where(sp => sp.CustomerId == CustomerId)
-                .Include(sp => sp.Product)
-                .ToListAsync();
+                    .Select(sp => sp.Product)
+                    .Include(p => p.Reviews)
+                    .Include(p => p.Category)
+                    .Include(p => p.Vendor)
+                    .ToListAsync();
         }
 
         public async Task<bool> SaveProductAsync(SavedProduct savedProduct)
@@ -26,15 +29,10 @@ namespace Marketplace.DAL.Repository
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UnsaveProductAsync(int id)
+        public async Task<bool> UnsaveProductAsync(SavedProduct savedProduct)
         {
-            var savedProduct = await _dbContext.SavedProducts.FindAsync(id);
-            if (savedProduct != null)
-            {
-                _dbContext.SavedProducts.Remove(savedProduct);
-                return await _dbContext.SaveChangesAsync() > 0;
-            }
-            return false;
+            _dbContext.SavedProducts.Remove(savedProduct);
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 }

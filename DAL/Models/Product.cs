@@ -13,7 +13,7 @@ namespace Marketplace.DAL.Models
         public string ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int Quantity { get; set; }
-        public int ViewersNumber { get; set; }
+        public int ViewsNumber { get; set; }
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
@@ -21,9 +21,9 @@ namespace Marketplace.DAL.Models
         [ForeignKey("VendorId")]
         public Vendor Vendor { get; set; }
         public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Pending;
-        public string? AdminIdApproved { get; set; }
-        [ForeignKey("AdminIdApproved")]
-        public Admin? AdminApproved { get; set; }
+        public string? AdminCheckedId { get; set; }
+        [ForeignKey("AdminCheckedId")]
+        public Admin? AdminChecked { get; set; }
         public string? RejectionReason { get; set; }
         public ICollection<SavedProduct> SavedProducts { get; set; } = new List<SavedProduct>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
