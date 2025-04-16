@@ -10,6 +10,8 @@ namespace Marketplace.DAL.IRepository
         Task<IEnumerable<Product>> GetAcceptedProductsByVendorIdAsync(string vendorId);
         Task<IEnumerable<Product>> GetProductsByPriceRangeAsync(decimal minPrice, decimal maxPrice);
         Task<IEnumerable<Product>> GetProductsByCategoryNameAsync(string categoryName);
+        Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId);
+
         Task<Product> GetAcceptedProductByIdAsync(int productId);
 
         // Admin

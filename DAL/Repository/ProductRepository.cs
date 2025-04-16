@@ -19,7 +19,8 @@ namespace Marketplace.DAL.Repository
         {
             return _dbContext.Products
                 .Include(p => p.Category)
-                .Include(p => p.Vendor);
+                .Include(p => p.Vendor)
+                .Include(p => p.Reviews);
         }
         private IQueryable<Product> GetAcceptedProductQuery()
         {
@@ -59,6 +60,13 @@ namespace Marketplace.DAL.Repository
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId)
+        {
+            return await GetAcceptedProductQuery()
+                .Where(p => p.Category.Id == categoryId)
+                .ToListAsync();
+        }
+
         public async Task<Product> GetAcceptedProductByIdAsync(int productId)
         {
             return await GetAcceptedProductQuery()
@@ -69,7 +77,7 @@ namespace Marketplace.DAL.Repository
         // admin
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
-            return await GetBaseProductQuery().ToListAsync();
+            return await GetAcceptedProductQuery().Intersect(GetBaseProductQuery()).ToListAsync();
         }
         public async Task<IEnumerable<Product>> GetRejectedProductsAsync()
         {

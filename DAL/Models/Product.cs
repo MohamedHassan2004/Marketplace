@@ -13,7 +13,7 @@ namespace Marketplace.DAL.Models
         public string ImageUrl { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int Quantity { get; set; }
-        public int ViewsNumber { get; set; }
+        public int ViewsNumber { get; set; } = 0;
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }

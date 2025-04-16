@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Socialify.DAL.Repository;
+using System.Security.Claims;
 using System.Text;
 
 namespace Marketplace
@@ -49,11 +49,13 @@ namespace Marketplace
                     {
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                        ValidIssuer = "backendApplication",
-                        ValidAudience = "weather",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
+
 
             builder.Services.AddAutoMapper(typeof(Program));
 
@@ -69,9 +71,11 @@ namespace Marketplace
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProductService, ProductService>();
-            //builder.Services.AddScoped<ICategoryService, CategoryService>();
-            //builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<ISavedProductService, SavedProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             //builder.Services.AddScoped<IProductReviewService, ProductReviewService>();
+            //builder.Services.AddScoped<IOrderService, OrderService>();
+            //builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             //builder.Services.AddScoped<IVendorService, VendorService>();
 
 

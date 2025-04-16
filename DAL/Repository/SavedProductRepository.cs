@@ -12,15 +12,17 @@ namespace Marketplace.DAL.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<IEnumerable<Product>> GetSavedProductsByCustomerIdAsync(string CustomerId)
+        public async Task<IEnumerable<SavedProduct>> GetSavedProductsByCustomerIdAsync(string CustomerId)
         {
             return await _dbContext.SavedProducts
                 .Where(sp => sp.CustomerId == CustomerId)
-                    .Select(sp => sp.Product)
-                    .Include(p => p.Reviews)
-                    .Include(p => p.Category)
-                    .Include(p => p.Vendor)
-                    .ToListAsync();
+                .Include(sp => sp.Product)
+                    .ThenInclude(p => p.Reviews)
+                .Include(sp => sp.Product)
+                    .ThenInclude(p => p.Category)
+                .Include(sp => sp.Product)
+                    .ThenInclude(p => p.Vendor)
+                .ToListAsync();
         }
 
         public async Task<bool> SaveProductAsync(SavedProduct savedProduct)
@@ -29,10 +31,16 @@ namespace Marketplace.DAL.Repository
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UnsaveProductAsync(SavedProduct savedProduct)
+        public async Task<bool> UnsaveProductAsync(int Id)
         {
-            _dbContext.SavedProducts.Remove(savedProduct);
-            return await _dbContext.SaveChangesAsync() > 0;
+            var productToUnsaved = _dbContext.SavedProducts.FirstOrDefault(sp => sp.Id == Id);
+            if (productToUnsaved != null)
+            {
+                _dbContext.SavedProducts.Remove(productToUnsaved);
+                return await _dbContext.SaveChangesAsync() > 0;
+            }
+            return false;
         }
+
     }
 }

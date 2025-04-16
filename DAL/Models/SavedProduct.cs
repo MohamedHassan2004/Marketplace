@@ -8,7 +8,7 @@ namespace Marketplace.DAL.Models
         public int Id { get; set; }
         public int ProductId { get; set; }
         public string CustomerId { get; set; }
-        public DateTime SavedDate { get; set; }
+        public DateTime SavedDate { get; set; } = DateTime.Now;
         [ForeignKey("ProductId")]
         public virtual Product Product { get; set; }
         [ForeignKey("CustomerId")]

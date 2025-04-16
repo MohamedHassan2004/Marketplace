@@ -19,10 +19,35 @@ namespace Marketplace.Services.Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetSavedProductsAsync(string customerId)
+        public async Task<IEnumerable<SavedProductDto>> GetSavedProductsAsync(string customerId)
         {
             var savedProducts = await _savedProductRepository.GetSavedProductsByCustomerIdAsync(customerId);
-            var productDtos = _mapper.Map<IEnumerable<ProductDto>>(savedProducts,opt => opt.Items["customerId"] = customerId);
+            var productDtos = new List<SavedProductDto>();
+            foreach (var savedProduct in savedProducts)
+            {
+                var dto = new SavedProductDto()
+                {
+                    SaveId = savedProduct.Id,
+                    SavedAt = savedProduct.SavedDate,
+                    IsSaved = true,
+                    Id = savedProduct.ProductId,
+                    Title = savedProduct.Product.Title,
+                    Description = savedProduct.Product.Description,
+                    ImageUrl = savedProduct.Product.ImageUrl,
+                    Price = savedProduct.Product.Price,
+                    Quantity = savedProduct.Product.Quantity,
+                    CreatedAt = savedProduct.Product.CreatedAt,
+                    ViewsNumber = savedProduct.Product.ViewsNumber,
+                    CategoryId = savedProduct.Product.CategoryId,
+                    CategoryName = savedProduct.Product.Category.Name,
+                    VendorId = savedProduct.Product.VendorId,
+                    VendorName = savedProduct.Product.Vendor.UserName,
+                    AverageRating = savedProduct.Product.Reviews.Any()
+                        ? MathF.Round((float)savedProduct.Product.Reviews.Average(r => r.Rating), 2)
+                        : 0
+                };
+                productDtos.Add(dto);
+            }
             return productDtos;
         }
 
@@ -41,18 +66,9 @@ namespace Marketplace.Services.Service
             return await _savedProductRepository.SaveProductAsync(savedProduct);
         }
 
-        public async Task<bool> UnsaveProduct(int productId, string customerId)
+        public async Task<bool> UnsaveProduct(int SaveId, string customerId)
         {
-            var product = await _productRepository.GetByIdAsync(productId);
-            if (product == null) return false;
-
-            var savedProduct = new SavedProduct
-            {
-                ProductId = productId,
-                CustomerId = customerId
-            };
-
-            return await _savedProductRepository.UnsaveProductAsync(savedProduct);
+            return await _savedProductRepository.UnsaveProductAsync(SaveId);
         }
     }
 

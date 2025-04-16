@@ -41,7 +41,19 @@ namespace Marketplace.Services.Service
                 return LoginResult.Fail("Invalid password.");
             }
 
-            var claims = await _userManager.GetClaimsAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var token = GenerateToken(claims);
 
             return LoginResult.Success("", token);
@@ -87,14 +99,6 @@ namespace Marketplace.Services.Service
             {
                 return RegisterResult.Fail("Invalid role.");
             }
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, registerDto.Role)
-            };
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 

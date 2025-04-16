@@ -4,8 +4,8 @@ namespace Marketplace.DAL.IRepository
 {
     public interface ISavedProductRepository
     {
-        Task<IEnumerable<Product>> GetSavedProductsByCustomerIdAsync(string CustomerId);
+        Task<IEnumerable<SavedProduct>> GetSavedProductsByCustomerIdAsync(string CustomerId);
         Task<bool> SaveProductAsync(SavedProduct savedProduct);
-        Task<bool> UnsaveProductAsync(SavedProduct savedProduct);
+        Task<bool> UnsaveProductAsync(int Id);
     }
 }
