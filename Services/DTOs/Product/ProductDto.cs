@@ -5,7 +5,7 @@ using Marketplace.DAL.Enums;
 
 namespace Marketplace.Services.DTOs.Product
 {
-    public class AcceptedProductDto
+    public class ProductDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -19,8 +19,11 @@ namespace Marketplace.Services.DTOs.Product
         public string CategoryName { get; set; }
         public string VendorId { get; set; }
         public string VendorName { get; set; }
-        public string AdminApprovedName { get; set; }
+        public ApprovalStatus ApprovalStatus { get; set; }
+        public string AdminCheckedName { get; set; }
+        public string? RejectionReason { get; set; }
         public bool IsSaved { get; set; }
+        public bool canBeDeleted { get; set; }
         public float AverageRating { get; set; }
     }
 }

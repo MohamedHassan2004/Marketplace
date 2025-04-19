@@ -6,13 +6,12 @@ namespace Marketplace.DAL.IRepository
     {
 
         // Customer + Vendor + Admin
+        Task<Product> GetProductByIdAsync(int productId);
         Task<IEnumerable<Product>> GetAcceptedProductsAsync();
         Task<IEnumerable<Product>> GetAcceptedProductsByVendorIdAsync(string vendorId);
         Task<IEnumerable<Product>> GetProductsByPriceRangeAsync(decimal minPrice, decimal maxPrice);
         Task<IEnumerable<Product>> GetProductsByCategoryNameAsync(string categoryName);
         Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId);
-
-        Task<Product> GetAcceptedProductByIdAsync(int productId);
 
         // Admin
         Task<IEnumerable<Product>> GetAllProductsAsync();
@@ -23,6 +22,5 @@ namespace Marketplace.DAL.IRepository
         Task<IEnumerable<Product>> GetAllProductsByVendorIdAsync(string vendorId);
         Task<IEnumerable<Product>> GetRejectedProductsByVendorIdAsync(string vendorId);
         Task<IEnumerable<Product>> GetWaitingProductsByVendorIdAsync(string vendorId);
-        Task<Product> GetProductByIdAsync(int productId);
     }
 }

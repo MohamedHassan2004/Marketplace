@@ -28,10 +28,10 @@ namespace Marketplace.DAL.Repository
 
         public async Task<bool> DeleteByIdAsync(int Id)
         {
-            var product = await _context.Products.FindAsync(Id);
-            if (product == null) return false;
+            var entity = await _dbSet.FindAsync(Id);
+            if (entity == null) return false;
 
-            _context.Products.Remove(product);
+            _dbSet.Remove(entity);
             return await _context.SaveChangesAsync() > 0;
         }
 

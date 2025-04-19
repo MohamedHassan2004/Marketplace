@@ -1,6 +1,8 @@
 ﻿using Marketplace.DAL.Models;
+using Marketplace.Services.DTOs;
 using Marketplace.Services.DTOs.Product;
 using Marketplace.Services.IService;
+using Marketplace.Services.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,11 +39,14 @@ namespace Marketplace.Controllers
         }
 
         [Authorize(Roles = "Vendor")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductCreateDto product)
+        [HttpPut("{id}")] 
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductCreateDto productDto)
         {
-            var result = await _productService.UpdateProductAsync(product);
-            return result ? Ok("Product updated successfully.") : BadRequest("Failed to update product.");
+            var result = await _productService.UpdateProductAsync(id, productDto);
+            if (!result)
+                return NotFound();
+
+            return NoContent();
         }
 
         [HttpGet("accepted")]
@@ -143,13 +148,12 @@ namespace Marketplace.Controllers
             return result ? Ok("Views updated.") : NotFound("Product not found.");
         }
 
-        // Optionally implement these when needed
-        //[HttpGet("admin/all")]
-        //public async Task<IActionResult> GetAllProducts()
-        //{
-        //    var products = await _productService.GetAllProductsAsync();
-        //    return Ok(products);
-        //}
+        [HttpGet("admin/all")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            var products = await _productService.GetAllProductsAsync();
+            return Ok(products);
+        }
     }
-    }
+}
 

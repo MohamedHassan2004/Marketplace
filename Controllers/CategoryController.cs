@@ -35,11 +35,14 @@ namespace Marketplace.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut]
-        public async Task<IActionResult> Update([FromBody] CategoryDto categoryDto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDto categoryDto)
         {
-            var result = await _categoryService.UpdateCategoryAsync(categoryDto);
-            return result ? Ok("Category updated successfully.") : BadRequest("Failed to update category.");
+            var result = await _categoryService.UpdateCategoryAsync(id, categoryDto);
+            if (!result)
+                return NotFound();
+
+            return NoContent();
         }
 
         [Authorize(Roles = "Admin")]

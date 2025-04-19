@@ -67,12 +67,6 @@ namespace Marketplace.DAL.Repository
                 .ToListAsync();
         }
 
-        public async Task<Product> GetAcceptedProductByIdAsync(int productId)
-        {
-            return await GetAcceptedProductQuery()
-                .FirstOrDefaultAsync(p => p.Id == productId);
-        }
-
 
         // admin
         public async Task<IEnumerable<Product>> GetAllProductsAsync()

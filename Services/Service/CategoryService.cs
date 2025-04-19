@@ -47,10 +47,14 @@ namespace Marketplace.Services.Service
             return null;
         }
 
-        public Task<bool> UpdateCategoryAsync(CategoryDto category)
+        public async Task<bool> UpdateCategoryAsync(int id, CategoryDto categoryDto)
         {
-            var entity = _mapper.Map<Category>(category);
-            return _categoryRepository.UpdateAsync(entity);
+            var existingCategory = await _categoryRepository.GetByIdAsync(id);
+            if (existingCategory == null)
+                return false;
+
+            _mapper.Map(categoryDto, existingCategory);
+            return await _categoryRepository.UpdateAsync(existingCategory);
         }
     }
 }
