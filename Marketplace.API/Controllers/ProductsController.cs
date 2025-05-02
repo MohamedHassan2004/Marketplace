@@ -112,7 +112,7 @@ namespace Marketplace.Controllers
         }
 
         [HttpGet("accepted/{productOrCategoryName}")]
-        public async Task<IActionResult> GetAcceptedProductsByProductName(string productOrCategoryName)
+        public async Task<IActionResult> GetAcceptedProductsByProductOrCategoryName(string productOrCategoryName)
         {
             var role = User.FindFirstValue(ClaimTypes.Role);
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

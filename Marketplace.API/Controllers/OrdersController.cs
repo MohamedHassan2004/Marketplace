@@ -51,17 +51,6 @@ namespace Marketplace.API.Controllers
             }
         }
 
-        [Authorize(Roles = "Customer")]
-        [HttpDelete("{orderId}")]
-        public async Task<IActionResult> DeleteOrder(int orderId)
-        {
-            var result = await _orderService.DeleteOrderAsync(orderId);
-            if (!result)
-                return NotFound($"Order with ID {orderId} not found.");
-
-            return Ok("Order deleted successfully.");
-        }
-
 
         [Authorize(Roles = "Customer")]
         [HttpGet("has-cart")]

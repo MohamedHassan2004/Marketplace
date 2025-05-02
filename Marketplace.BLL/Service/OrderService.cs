@@ -62,12 +62,6 @@ namespace Marketplace.Services.Service
         }
 
 
-        public async Task<bool> DeleteOrderAsync(int orderId)
-        {
-            return await _orderRepository.DeleteByIdAsync(orderId);
-        }
-
-
         public async Task<IEnumerable<OrderDto>> GetCompletedOrdersByCustomerIdAsync(string customerId)
         {
             var orderEntities = await _orderRepository.GetCompletedOrdersByCustomerAsync(customerId);
