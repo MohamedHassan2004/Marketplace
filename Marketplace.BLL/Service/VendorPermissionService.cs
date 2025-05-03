@@ -29,6 +29,19 @@ namespace Marketplace.Services.Service
             return await _vendorPermissionRepository.AssignPermissionToVendorAsync(vendorPermissionDto.VendorId, vendorPermissionDto.PermissionId, adminId);
         }
 
+        public async Task<VendorPermissionDto> GetVendorPermissionByIdAsync(int id)
+        {
+            var vendorPermission = await _vendorPermissionRepository.GetVendorPermissionByIdAsync(id);
+            var dto = new VendorPermissionDto
+            {
+                VendorId = vendorPermission.VendorId,
+                AdminId = vendorPermission.AdminId,
+                PermissionId = vendorPermission.PermissionId,
+                AssignedDate = vendorPermission.AssignedDate
+            };
+            return dto;
+        }
+
         public async Task<IEnumerable<VendorPermissionDto>> GetVendorWithPermissionsDetailsAsync(string vendorId)
         {
             var vendorPermissions = await _vendorPermissionRepository.GetVendorWithPermissionsDetailsAsync(vendorId);
@@ -47,7 +60,9 @@ namespace Marketplace.Services.Service
 
         public async Task<bool> RemovePermissionFromVendorAsync(int id)
         {
-            return await _vendorPermissionRepository.RemovePermissionFromVendorAsync(id);
+            var vendorPermission = await _vendorPermissionRepository.GetVendorPermissionByIdAsync(id);
+            if (vendorPermission == null) return false;
+            return await _vendorPermissionRepository.RemovePermissionFromVendorAsync(vendorPermission);
         }
     }
 }

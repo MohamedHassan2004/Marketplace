@@ -33,8 +33,8 @@ namespace Marketplace.DAL.Repository
                 .ToListAsync();
         }
 
-        public async Task<bool> RemovePermissionFromVendorAsync(int Id) 
-        { 
+        public async Task<bool> RemovePermissionFromVendorAsync(int Id)
+        {
             var vendorPermission = await _dbContext.VendorPermissions.FindAsync(Id);
             if (vendorPermission != null)
             {

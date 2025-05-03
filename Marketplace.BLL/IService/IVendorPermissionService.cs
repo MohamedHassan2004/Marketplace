@@ -7,5 +7,6 @@ namespace Marketplace.Services.IService
         Task<bool> AssignPermissionToVendorAsync(CreateVendorPermissionDto vendorPermissionDto, string adminId);
         Task<bool> RemovePermissionFromVendorAsync(int id);
         Task<IEnumerable<VendorPermissionDto>> GetVendorWithPermissionsDetailsAsync(string vendorId);
+        Task<VendorPermissionDto> GetVendorPermissionByIdAsync(int id);
     }
 }

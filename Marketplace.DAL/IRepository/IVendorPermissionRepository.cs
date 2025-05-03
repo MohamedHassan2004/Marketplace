@@ -7,6 +7,7 @@ namespace Marketplace.DAL.IRepository
     {
         Task<IEnumerable<VendorPermission>> GetVendorWithPermissionsDetailsAsync(string vendorId);
         Task<bool> AssignPermissionToVendorAsync(string vendorId, int permissionId, string adminId);
-        Task<bool> RemovePermissionFromVendorAsync(int Id);
+        Task<bool> RemovePermissionFromVendorAsync(VendorPermission vendorPermission);
+        Task<VendorPermission> GetVendorPermissionByIdAsync(int Id);
     }
 }
