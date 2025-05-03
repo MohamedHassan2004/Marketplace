@@ -1,11 +1,12 @@
 using AutoMapper;
-using Marketplace.API.Hubs;
 using Marketplace.BLL.IService;
 using Marketplace.BLL.Service;
 using Marketplace.DAL.Context;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models.Users;
 using Marketplace.DAL.Repository;
+using Marketplace.DAL.WebSockets;
+using Marketplace.Extensions;
 using Marketplace.Filters;
 using Marketplace.Middlewares;
 using Marketplace.Services.AutoMapper;
@@ -14,6 +15,7 @@ using Marketplace.Services.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -43,7 +45,6 @@ namespace Marketplace
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
             })
             .AddEntityFrameworkStores<MarketplaceDbContext>();
-
 
             builder.Services.AddAuthentication(options =>
             {
@@ -76,36 +77,12 @@ namespace Marketplace
                 }
             });
 
-
             builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-            builder.Services.AddScoped<IAuthorizationHandler, HasPermissionHandler>();
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
-            builder.Services.AddScoped<ISavedProductRepository, SavedProductRepository>();
-            builder.Services.AddScoped<IVendorPermissionRepository, VendorPermissionRepository>();
-            builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-            builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
-            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            // Use the extension method to add services  
+            builder.Services.AddMarketplaceServices();
 
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<ISavedProductService, SavedProductService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<IPermisssionService, PermisssionService>();
-            builder.Services.AddScoped<IVendorPermissionService, VendorPermissionService>();
-            builder.Services.AddScoped<IVendorService, VendorService>();
-            builder.Services.AddScoped<IOrderService, OrderService>();
-            builder.Services.AddScoped<IOrderItemService, OrderItemService>();
-            builder.Services.AddScoped<INotificationService, NotificationService>();
-
-            builder.Services.AddSignalR();
-
-
-
-            // CORS
+            // CORS  
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowReactApp",
@@ -117,7 +94,6 @@ namespace Marketplace
                     });
             });
 
-
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
@@ -126,29 +102,60 @@ namespace Marketplace
             var app = builder.Build();
 
 
-            // seed data in database
+            // web socket  
+            var webSocketOptions = new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            };
+            app.UseWebSockets(webSocketOptions);
+
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.Path == "/ws")
+                {
+                    if (context.WebSockets.IsWebSocketRequest)
+                    {
+                        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        var connectionManager = context.RequestServices.GetRequiredService<WebSocketConnectionManager>();
+                        var vendorId = context.Request.Query["vendorId"]; // Assume vendorId is passed as a query parameter
+                        connectionManager.AddConnection(vendorId, webSocket);
+
+                        // Keep the WebSocket connection open
+                        await connectionManager.HandleConnectionAsync(vendorId, webSocket);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 400;
+                    }
+                }
+                else
+                {
+                    await next();
+                }
+            });
+
+
+            // seed data in database  
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
 
-                // Role seeding
+                // Role seeding  
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 MarketplaceDbContextSeed.SeedRolesAsync(roleManager).Wait();
 
-                // Data seeding
+                // Data seeding  
                 var context = services.GetRequiredService<MarketplaceDbContext>();
 
                 MarketplaceDbContextSeed.SeedCategoriesAsync(context).Wait();
                 MarketplaceDbContextSeed.SeedPermissionsAsync(context).Wait();
             }
 
-
-            // Cors
+            // Cors  
             app.UseCors("AllowReactApp");
             app.UseStaticFiles();
 
-
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline.  
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -156,8 +163,6 @@ namespace Marketplace
             }
 
             app.UseHttpsRedirection();
-
-            app.MapHub<NotificationHub>("/notificationHub");
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 

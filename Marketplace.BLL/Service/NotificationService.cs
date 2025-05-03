@@ -4,9 +4,12 @@ using Marketplace.BLL.IService;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
 using Marketplace.DAL.Models.Users;
+using Marketplace.DAL.WebSockets;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,12 +20,38 @@ namespace Marketplace.BLL.Service
         private readonly INotificationRepository _notificationRepository;
         private readonly IVendorRepository _vendorRepository;
         private readonly IMapper _mapper;
+        private readonly WebSocketConnectionManager _webSocketConnectionManager;
 
-        public NotificationService(INotificationRepository notificationRepository, IVendorRepository vendorRepository, IMapper mapper)
+        public NotificationService(INotificationRepository notificationRepository, WebSocketConnectionManager webSocketConnectionManager, IMapper mapper, IVendorRepository vendorRepository)
         {
             _notificationRepository = notificationRepository;
-            _vendorRepository = vendorRepository;
+            _webSocketConnectionManager = webSocketConnectionManager;
             _mapper = mapper;
+            _vendorRepository = vendorRepository;
+        }
+
+        public async Task<bool> SendNotificationAsync(string userId, string message)
+        {
+            var notification = new Notification
+            {
+                UserId = userId,
+                Message = message,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _notificationRepository.AddAsync(notification);
+
+            // Send notification via WebSocket
+            var socket = _webSocketConnectionManager.GetSocketByVendorId(userId);
+            if (socket != null && socket.State == WebSocketState.Open)
+            {
+                var notificationMessage = Encoding.UTF8.GetBytes(message);
+                await socket.SendAsync(new ArraySegment<byte>(notificationMessage), WebSocketMessageType.Text, true, CancellationToken.None);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<bool> DeleteNotificationAsync(int notificationId)
@@ -43,37 +72,13 @@ namespace Marketplace.BLL.Service
             {
                 return Enumerable.Empty<NotificationDto>();
             }
+            foreach (var notification in NotificationsEntities)
+            {
+                notification.IsRead = true;
+                await _notificationRepository.UpdateAsync(notification);
+            }
             var dtos = _mapper.Map<IEnumerable<NotificationDto>>(NotificationsEntities);
             return dtos;
-        }
-
-        public async Task<bool> MarkNotificationAsReadAsync(int notificationId)
-        {
-            var notification = await _notificationRepository.GetNotificationByIdAsync(notificationId);
-            if (notification == null)
-            {
-                return false;
-            }
-            notification.IsRead = true;
-            await _notificationRepository.UpdateAsync(notification);
-            return true;
-        }
-
-        public async Task<bool> SendNotificationAsync(string userId, string message)
-        {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(message))
-            {
-                return false;
-            }
-            var notification = new Notification
-            {
-                UserId = userId,
-                Message = message,
-                CreatedAt = DateTime.UtcNow,
-                IsRead = false
-            };
-            await _notificationRepository.AddAsync(notification);
-            return true;
         }
 
         public async Task<bool> SendNotificationToAllVendorsAsync(string message)
@@ -96,5 +101,8 @@ namespace Marketplace.BLL.Service
             }
             return true;
         }
+
     }
+
+
 }

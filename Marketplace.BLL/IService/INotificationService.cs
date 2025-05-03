@@ -11,8 +11,6 @@ namespace Marketplace.BLL.IService
     {
         Task<bool> SendNotificationAsync(string userId, string message);
         Task<IEnumerable<NotificationDto>> GetNotificationsByUserIdAsync(string userId);
-        Task<bool> MarkNotificationAsReadAsync(int notificationId);
         Task<bool> DeleteNotificationAsync(int notificationId);
-        Task<bool> SendNotificationToAllVendorsAsync(string message);
     }
 }

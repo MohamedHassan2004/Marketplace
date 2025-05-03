@@ -18,7 +18,5 @@ namespace Marketplace.DAL.Models
         public DateTime CreatedAt { get; set; }
         public bool IsRead { get; set; } = false;
         public string UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
     }
 }
