@@ -34,6 +34,7 @@ namespace Marketplace.Services.Service
             var vendorPermission = await _vendorPermissionRepository.GetVendorPermissionByIdAsync(id);
             var dto = new VendorPermissionDto
             {
+                VendorPermissionId = vendorPermission.Id,
                 VendorId = vendorPermission.VendorId,
                 AdminId = vendorPermission.AdminId,
                 PermissionId = vendorPermission.PermissionId,
@@ -51,6 +52,7 @@ namespace Marketplace.Services.Service
 
             return vendorPermissions.Select(vp => new VendorPermissionDto
             {
+                VendorPermissionId = vp.Id,
                 VendorId = vp.VendorId,
                 AdminId = vp.AdminId,
                 PermissionId = vp.PermissionId,
