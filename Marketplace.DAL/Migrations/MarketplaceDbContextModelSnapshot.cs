@@ -44,6 +44,36 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Marketplace.DAL.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("Marketplace.DAL.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -504,6 +534,17 @@ namespace Marketplace.DAL.Migrations
                     b.HasDiscriminator().HasValue("Vendor");
                 });
 
+            modelBuilder.Entity("Marketplace.DAL.Models.Notification", b =>
+                {
+                    b.HasOne("Marketplace.DAL.Models.Users.ApplicationUser", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Marketplace.DAL.Models.Order", b =>
                 {
                     b.HasOne("Marketplace.DAL.Models.Users.Customer", "Customer")
@@ -694,6 +735,11 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Orders");
 
                     b.Navigation("SavedProducts");
+                });
+
+            modelBuilder.Entity("Marketplace.DAL.Models.Users.ApplicationUser", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("Marketplace.DAL.Models.Users.Admin", b =>

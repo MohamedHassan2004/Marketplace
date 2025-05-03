@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
+using Marketplace.BLL.IService;
 
 namespace Marketplace.Controllers
 {
@@ -18,10 +19,12 @@ namespace Marketplace.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly INotificationService _notificationService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, INotificationService notificationService)
         {
             _productService = productService;
+            _notificationService = notificationService;
         }
 
         [HttpPost]
@@ -193,6 +196,13 @@ namespace Marketplace.Controllers
         public async Task<IActionResult> UpdateProductStatus(int productId, [FromBody] ProductStatusUpdateDto dto)
         {
             var result = await _productService.UpdateProductStatusAsync(productId, dto);
+            var product = await _productService.GetProductByIdAsync("Admin", null, productId);
+
+            // send notification
+            var notificationMessage = dto.Status == ApprovalStatus.Approved
+                ? "Your product has been accepted."
+                : "Your product has been rejected.";
+            await _notificationService.SendNotificationAsync(product.VendorId, notificationMessage);
             return result ? Ok("Product status updated.") : NotFound("Product not found.");
         }
 

@@ -21,6 +21,7 @@ namespace Marketplace.DAL.Context
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<VendorPermission> VendorPermissions { get; set; }
         public DbSet<Permission> Permissions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,4 +1,7 @@
 using AutoMapper;
+using Marketplace.API.Hubs;
+using Marketplace.BLL.IService;
+using Marketplace.BLL.Service;
 using Marketplace.DAL.Context;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models.Users;
@@ -85,6 +88,7 @@ namespace Marketplace
             builder.Services.AddScoped<IVendorRepository, VendorRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProductService, ProductService>();
@@ -95,6 +99,9 @@ namespace Marketplace
             builder.Services.AddScoped<IVendorService, VendorService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+
+            builder.Services.AddSignalR();
 
 
 
@@ -149,6 +156,8 @@ namespace Marketplace
             }
 
             app.UseHttpsRedirection();
+
+            app.MapHub<NotificationHub>("/notificationHub");
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
