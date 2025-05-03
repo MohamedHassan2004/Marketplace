@@ -25,6 +25,11 @@ namespace Marketplace.DAL.Repository
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
+        public async Task<VendorPermission> GetVendorPermissionByIdAsync(int Id)
+        {
+            return await _dbContext.VendorPermissions.FindAsync(Id);
+        }
+
         public async Task<IEnumerable<VendorPermission>> GetVendorWithPermissionsDetailsAsync(string vendorId)
         {
             return await _dbContext.VendorPermissions
@@ -33,15 +38,10 @@ namespace Marketplace.DAL.Repository
                 .ToListAsync();
         }
 
-        public async Task<bool> RemovePermissionFromVendorAsync(int Id)
-        {
-            var vendorPermission = await _dbContext.VendorPermissions.FindAsync(Id);
-            if (vendorPermission != null)
-            {
-                _dbContext.VendorPermissions.Remove(vendorPermission);
-                return await _dbContext.SaveChangesAsync() > 0;
-            }
-            return false;
+        public async Task<bool> RemovePermissionFromVendorAsync(VendorPermission vendorPermission) 
+        { 
+            _dbContext.VendorPermissions.Remove(vendorPermission);
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 }

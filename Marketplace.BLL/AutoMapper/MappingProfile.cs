@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Marketplace.BLL.DTOs;
 using Marketplace.DAL.Models;
 using Marketplace.DAL.Models.Users;
 using Marketplace.Services.DTOs;
@@ -93,7 +94,9 @@ namespace Marketplace.Services.AutoMapper
             .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src =>
                 src.OrderItems.Sum(item => item.Quantity * item.Product.Price) + src.ShippingCost
             ));
-           
+
+            CreateMap<Notification, NotificationDto>();
+
         }
     }
 }
