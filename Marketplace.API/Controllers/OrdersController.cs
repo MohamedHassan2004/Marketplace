@@ -22,11 +22,11 @@ namespace Marketplace.API.Controllers
         public async Task<IActionResult> CreateOrder()
         {
             var customerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await _orderService.CreateOrderAsync(customerId);
-            if (!result)
+            var orderId = await _orderService.CreateOrderAsync(customerId);
+            if (orderId == 0)
                 return StatusCode(500, "Failed to create order.");
 
-            return Ok("Order created successfully.");
+            return Ok(orderId);
         }
 
         [Authorize(Roles = "Customer")]

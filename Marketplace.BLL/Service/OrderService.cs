@@ -20,10 +20,11 @@ namespace Marketplace.Services.Service
             _mapper = mapper;
         }
 
-        public async Task<bool> CreateOrderAsync(string customerId)
+        public async Task<int> CreateOrderAsync(string customerId)
         {
             var order = new Order() { CustomerId = customerId};
-            return await _orderRepository.AddAsync(order);
+            await _orderRepository.AddAsync(order);
+            return order.Id;
         }
 
         public async Task<bool> ConfirmOrderAsync(int orderId, ConfirmOrderDto orderDto)
