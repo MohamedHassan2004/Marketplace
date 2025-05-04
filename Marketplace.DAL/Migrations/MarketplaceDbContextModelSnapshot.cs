@@ -58,10 +58,6 @@ namespace Marketplace.DAL.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(200)

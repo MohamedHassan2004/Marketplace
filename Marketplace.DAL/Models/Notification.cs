@@ -14,7 +14,6 @@ namespace Marketplace.DAL.Models
         public int Id { get; set; }
         [StringLength(200)]
         public required string Message { get; set; }
-        public string Link { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public bool IsRead { get; set; } = false;
         public string UserId { get; set; }

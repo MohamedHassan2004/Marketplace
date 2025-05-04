@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marketplace.DAL.Migrations
 {
     [DbContext(typeof(MarketplaceDbContext))]
-    [Migration("20250503200651_notifications")]
-    partial class notifications
+    [Migration("20250504165356_initalCreateAfterNotificationError")]
+    partial class initalCreateAfterNotificationError
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,10 +60,6 @@ namespace Marketplace.DAL.Migrations
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Message")
                         .IsRequired()
