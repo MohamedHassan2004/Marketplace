@@ -3,6 +3,7 @@ using Marketplace.DAL.Enums;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace Marketplace.DAL.Repository
 {
@@ -13,6 +14,13 @@ namespace Marketplace.DAL.Repository
         public OrderItemRepository(MarketplaceDbContext context) : base(context)
         {
             _dbContext = context;
+        }
+
+        public new async Task<OrderItem> GetByIdAsync(int id)
+        {
+            return await _dbContext.OrderItems
+                .Include(oi => oi.Product)
+                .FirstOrDefaultAsync(oi => oi.Id == id);
         }
 
         public async Task<IEnumerable<OrderItem>> GetProductHistoryAsync(int productId)

@@ -37,10 +37,10 @@ namespace Marketplace.Services.Service
             {
                 return false;
             }
-            if (newQuantity < 0 || newQuantity > orderItem.Quantity)
+            if (newQuantity < 0 || newQuantity > orderItem.Product.Quantity)
             {
                 return false;
-            }   
+            }    
             orderItem.Quantity = newQuantity;
             return await _orderItemRepository.UpdateAsync(orderItem);
         }

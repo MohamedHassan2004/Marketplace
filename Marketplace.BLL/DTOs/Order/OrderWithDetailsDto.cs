@@ -20,10 +20,12 @@ namespace Marketplace.Services.DTOs.Order
 
     public class OrderItemDto
     {
+        public int Id { get; set; }
         public int ProductId { get; set; }
         public string ProductTitle { get; set; }
         public string ProductDescription { get; set; }
         public decimal ProductPrice { get; set; }
+        public int ProductQuantity { get; set; }
         public string ProductImageUrl { get; set; }
         public int OrderItemQuantity { get; set; }
         public decimal OrderItemTotalPrice { get; set; }

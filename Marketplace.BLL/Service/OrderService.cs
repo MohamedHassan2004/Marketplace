@@ -101,15 +101,17 @@ namespace Marketplace.Services.Service
                 Status = orderWithDetailsEntity.Status,
                 ConfirmedAt = orderWithDetailsEntity.ConfirmedAt,
                 ShippingCost = orderWithDetailsEntity.ShippingCost,
-                ShippingAddress = orderWithDetailsEntity.ShippingAddress,
+                ShippingAddress = orderWithDetailsEntity.ShippingAddress??"",
                 OrderNotes = orderWithDetailsEntity.OrderNotes,
                 TotalAmount = totalAmount + Consts.ShipingCost,
                 OrderItems = orderWithDetailsEntity.OrderItems.Select(oi => new OrderItemDto
                 {
+                    Id = oi.Id,
                     ProductId = oi.ProductId,
                     ProductTitle = oi.Product.Title,
                     ProductDescription = oi.Product.Description ?? "",
                     ProductPrice = oi.Product.Price,
+                    ProductQuantity = oi.Product.Quantity,
                     ProductImageUrl = oi.Product.ImageUrl,
                     OrderItemQuantity = oi.Quantity,
                     OrderItemTotalPrice = oi.Product.Price * oi.Quantity
