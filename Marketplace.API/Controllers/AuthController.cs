@@ -1,15 +1,9 @@
 ﻿using Marketplace.Services.DTOs.Auth;
 using Marketplace.Services.IService;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Marketplace.DAL.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Threading.Tasks;
 
-namespace Marketplace.Controllers
+namespace Marketplace.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -23,33 +17,51 @@ namespace Marketplace.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var result = await _authService.Login(loginDto);
-
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return BadRequest(new { error = result.ErrorMessage });
+                return Ok(new
+                {
+                    token = result.Token,
+                    refreshToken = result.RefreshToken
+                });
             }
-
-            return Ok(new { token = result.Token });
+            return BadRequest(new { message = result.ErrorMessage });
         }
+
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             var result = await _authService.Register(registerDto);
-
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return BadRequest(new { error = result.ErrorMessage });
+                return Ok(new { message = "User registered successfully!", userId = result.UserId });
             }
-
-            return Ok(new { userId = result.UserId });
+            return BadRequest(new { message = result.ErrorMessage });
         }
 
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] string refreshTokenDto)
+        {
+            if (string.IsNullOrEmpty(refreshTokenDto))
+            {
+                return BadRequest(new { message = "Refresh token is required" });
+            }
 
+            var result = await _authService.RefreshTokenAsync(refreshTokenDto);
+            if (result.IsSuccess)
+            {
+                return Ok(new
+                {
+                    token = result.Token,
+                    refreshToken = result.RefreshToken
+                });
+            }
 
+            return BadRequest(new { message = result.ErrorMessage });
+        }
     }
-
 }

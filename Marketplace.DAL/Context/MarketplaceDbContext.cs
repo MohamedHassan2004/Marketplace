@@ -14,6 +14,7 @@ namespace Marketplace.DAL.Context
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<SavedProduct> SavedProducts { get; set; }
@@ -22,6 +23,7 @@ namespace Marketplace.DAL.Context
         public DbSet<VendorPermission> VendorPermissions { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

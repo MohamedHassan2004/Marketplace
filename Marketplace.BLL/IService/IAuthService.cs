@@ -7,5 +7,7 @@ namespace Marketplace.Services.IService
     {
         Task<LoginResult> Login(LoginDto loginDto);
         Task<RegisterResult> Register(RegisterDto registerDto);
+        Task Logout();
+        Task<TokenResult> RefreshTokenAsync(string refreshToken);
     }
 }
