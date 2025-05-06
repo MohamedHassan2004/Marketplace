@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Marketplace.BLL.DTOs;
+using Marketplace.DAL.Enums;
 using Marketplace.DAL.Models;
 using Marketplace.DAL.Models.Users;
 using Marketplace.Services.DTOs;
@@ -62,6 +63,13 @@ namespace Marketplace.Services.AutoMapper
 
                     // CanBuy logic
                     dest.CanBuy = role == "Customer" && src.Quantity > 0;
+
+                    // IsInCart logic
+                    if (!string.IsNullOrEmpty(userId) && role == "Customer")
+                    {
+                        dest.IsInCart = src.Orders
+                            .Any(o => o.CustomerId == userId && o.Status == OrderStatus.InCart);
+                    }
                 });
 
 

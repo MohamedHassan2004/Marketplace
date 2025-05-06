@@ -40,7 +40,8 @@ namespace Marketplace.Services.Service
                     CategoryId = savedProduct.Product.CategoryId,
                     CategoryName = savedProduct.Product.Category.Name,
                     VendorId = savedProduct.Product.VendorId,
-                    VendorName = savedProduct.Product.Vendor.UserName
+                    VendorName = savedProduct.Product.Vendor.UserName,
+                    IsInCart = savedProduct.Product.Orders.Any(o => o.CustomerId == userId && o.Status == OrderStatus.InCart)
                 };
                 productDtos.Add(dto);
             }

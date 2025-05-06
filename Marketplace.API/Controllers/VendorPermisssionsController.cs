@@ -10,13 +10,12 @@ namespace Marketplace.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
-    public class VendorPermissionController : ControllerBase
+    public class VendorPermissionsController : ControllerBase
     {
         private readonly IVendorPermissionService _vendorPermissionService;
         private readonly INotificationService _notificationService;
 
-        public VendorPermissionController(IVendorPermissionService vendorPermissionService, INotificationService notificationService)
+        public VendorPermissionsController(IVendorPermissionService vendorPermissionService, INotificationService notificationService)
         {
             _vendorPermissionService = vendorPermissionService;
             _notificationService = notificationService;
@@ -42,7 +41,7 @@ namespace Marketplace.API.Controllers
             return Ok(new { Message = "Permission assigned to vendor successfully." });
         }
 
-        [Authorize(Roles = "Admin, Vendor")]
+        [Authorize(Roles = "Admin,Vendor")]
         [HttpGet("{vendorId}")]
         public async Task<IActionResult> GetVendorPermissions(string vendorId)
         {
@@ -57,8 +56,8 @@ namespace Marketplace.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemovePermission(int id)
         {
-            var result = await _vendorPermissionService.RemovePermissionFromVendorAsync(id); 
             var vendorPermission = await _vendorPermissionService.GetVendorPermissionByIdAsync(id);
+            var result = await _vendorPermissionService.RemovePermissionFromVendorAsync(id); 
 
             if (!result)
                 return NotFound(new { Message = "Permission not found or already removed." });

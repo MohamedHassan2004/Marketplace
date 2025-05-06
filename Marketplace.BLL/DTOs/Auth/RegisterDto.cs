@@ -10,6 +10,9 @@ namespace Marketplace.Services.DTOs.Auth
         public string Email { get; set; }
         [MaxLength(30)]
         public string Password { get; set; }
+        [DataType(DataType.PhoneNumber)]
+        [MaxLength(15)]
+        public string PhoneNumber { get; set; }
         public string Role { get; set; }
     }
 }

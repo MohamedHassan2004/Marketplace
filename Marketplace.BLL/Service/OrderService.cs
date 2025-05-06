@@ -29,7 +29,8 @@ namespace Marketplace.Services.Service
 
         public async Task<bool> ConfirmOrderAsync(int orderId, ConfirmOrderDto orderDto)
         {
-            var orderEntity = await _orderRepository.GetByIdAsync(orderId);
+            var orderEntity = await _orderRepository.GetOrderByIdWithDetailsAsync(orderId);
+            
             if (orderEntity == null)
                 return false;
 
@@ -50,7 +51,10 @@ namespace Marketplace.Services.Service
 
             foreach (var item in orderEntity.OrderItems)
             {
-                await _productService.UpdateQuantityAsync(item.ProductId, -item.Quantity);
+                var newQuantity = item.Product.Quantity - item.Quantity;
+                if (newQuantity < 0)
+                    throw new InvalidOperationException($"Not enough quantity for product {item.ProductId}.");
+                await _productService.UpdateQuantityAsync(item.ProductId, newQuantity);
             }
 
             orderEntity.ConfirmedAt = DateTime.UtcNow;

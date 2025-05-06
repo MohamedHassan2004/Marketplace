@@ -17,6 +17,8 @@
         public string VendorId { get; set; }
         public string VendorName { get; set; }
         public bool IsSaved { get; set; } = true;
-        public bool CanBuy { get; set; }
+        public bool CanBuy { get; set; } = false;
+        public bool IsInCart { get; set; } = false;
+
     }
 }

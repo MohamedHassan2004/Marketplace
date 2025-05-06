@@ -227,6 +227,38 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("Marketplace.DAL.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Revoked")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Marketplace.DAL.Models.SavedProduct", b =>
                 {
                     b.Property<int>("Id")
@@ -594,6 +626,17 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("Marketplace.DAL.Models.RefreshToken", b =>
+                {
+                    b.HasOne("Marketplace.DAL.Models.Users.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Marketplace.DAL.Models.SavedProduct", b =>

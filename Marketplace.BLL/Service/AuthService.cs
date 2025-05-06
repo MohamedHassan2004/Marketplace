@@ -1,16 +1,20 @@
-﻿using Marketplace.DAL.Context;
+﻿using Castle.Core.Logging;
+using Marketplace.DAL.Context;
 using Marketplace.DAL.Models;
 using Marketplace.DAL.Models.Users;
 using Marketplace.Services.DTOs.Auth;
 using Marketplace.Services.IService;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Marketplace.BLL.Service
 {
@@ -20,13 +24,19 @@ namespace Marketplace.BLL.Service
         private readonly IConfiguration _config;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly MarketplaceDbContext _context;
+        private readonly ILogger<AuthService> _logger;
+        private readonly IDataProtector _protector;
 
-        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration config, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
+        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration config,
+            SignInManager<ApplicationUser> signInManager, MarketplaceDbContext context, IDataProtectionProvider provider,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _config = config;
             _signInManager = signInManager;
             _context = context;
+            _logger = logger;
+            _protector = provider.CreateProtector("EmailProtection");
         }
 
         public async Task<LoginResult> Login(LoginDto loginDto)
@@ -71,11 +81,13 @@ namespace Marketplace.BLL.Service
             if (existingUser != null)
                 return RegisterResult.Fail("Username already exists.");
 
+            registerDto.PhoneNumber = _protector.Protect(registerDto.PhoneNumber);
+
             ApplicationUser user = registerDto.Role switch
             {
-                "Vendor" => new Vendor { UserName = registerDto.Username, Email = registerDto.Email },
-                "Customer" => new Customer { UserName = registerDto.Username, Email = registerDto.Email },
-                "Admin" => new Admin { UserName = registerDto.Username, Email = registerDto.Email },
+                "Vendor" => new Vendor { UserName = registerDto.Username, Email = registerDto.Email, PhoneNumber = registerDto.PhoneNumber },
+                "Customer" => new Customer { UserName = registerDto.Username, Email = registerDto.Email, PhoneNumber = registerDto.PhoneNumber },
+                "Admin" => new Admin { UserName = registerDto.Username, Email = registerDto.Email, PhoneNumber = registerDto.PhoneNumber },
                 _ => null!
             };
 
@@ -90,6 +102,11 @@ namespace Marketplace.BLL.Service
             }
 
             await _userManager.AddToRoleAsync(user, registerDto.Role);
+
+
+            _logger.LogInformation($"Getting phone number: {user.PhoneNumber}");
+            _logger.LogInformation($"Getting phone number: {_protector.Unprotect(user.PhoneNumber)}");
+
             return RegisterResult.Success("", user.Id);
         }
 
@@ -129,12 +146,15 @@ namespace Marketplace.BLL.Service
 
         private async Task<List<Claim>> GenerateUserClaims(ApplicationUser user)
         {
+
             var roles = await _userManager.GetRolesAsync(user);
+            
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.MobilePhone, _protector.Unprotect(user.PhoneNumber)),
             };
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
@@ -145,7 +165,7 @@ namespace Marketplace.BLL.Service
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiry = DateTime.UtcNow.AddMinutes(15);
+            var expiry = DateTime.UtcNow.AddMinutes(100);
 
             var token = new JwtSecurityToken(
                 claims: claims,

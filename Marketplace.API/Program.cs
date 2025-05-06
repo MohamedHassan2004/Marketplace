@@ -82,6 +82,9 @@ namespace Marketplace
             // Use the extension method to add services  
             builder.Services.AddMarketplaceServices();
 
+            builder.Services.AddDataProtection();
+
+
             // CORS  
             builder.Services.AddCors(options =>
             {

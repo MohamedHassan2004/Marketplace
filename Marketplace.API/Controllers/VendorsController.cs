@@ -9,7 +9,6 @@ namespace Marketplace.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class VendorsController : ControllerBase
     {
         private readonly IVendorService _vendorService;
@@ -19,6 +18,7 @@ namespace Marketplace.API.Controllers
             _vendorService = vendorService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllVendors()
         {
@@ -26,6 +26,7 @@ namespace Marketplace.API.Controllers
             return Ok(vendors);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("waiting")]
         public async Task<IActionResult> GetWaitingVendors()
         {
@@ -33,6 +34,7 @@ namespace Marketplace.API.Controllers
             return Ok(vendors);
         }
 
+        [Authorize(Roles = "Admin,Vendor")]
         [HttpGet("{vendorId}")]
         public async Task<IActionResult> GetVendorById(string vendorId)
         {
@@ -43,6 +45,7 @@ namespace Marketplace.API.Controllers
             return Ok(vendor);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{vendorId}/status")]
         public async Task<IActionResult> UpdateVendorStatus(string vendorId ,[FromBody] VendorStatusUpdateDto model)
         {

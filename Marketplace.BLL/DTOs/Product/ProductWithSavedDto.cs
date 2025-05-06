@@ -23,5 +23,6 @@ namespace Marketplace.Services.DTOs.Product
         public bool CanBeUpdated { get; set; } = false;
         public bool IsSaved { get; set; } = false;
         public bool CanBuy { get; set; } = false;
+        public bool IsInCart { get; set; } = false;
     }
 }

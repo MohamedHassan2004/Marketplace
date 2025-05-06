@@ -160,18 +160,8 @@ namespace Marketplace.Services.Service
         {
             var product = await _productRepository.GetByIdAsync(productId);
             if (product == null) return false;
-            if (quantity > 0)
-            {
-                product.Quantity = quantity;
-            }
-            else
-            {
-                var newQuantity = product.Quantity - quantity;
-                if (newQuantity >= 0)
-                    product.Quantity -= quantity;
-                else return false;
-            }
-                return await _productRepository.UpdateAsync(product);
+            product.Quantity = quantity;    
+            return await _productRepository.UpdateAsync(product);
         }
 
         public async Task<IEnumerable<ProductHistoryDto>> GetProductHistoryAsync(int productId)
