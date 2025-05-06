@@ -67,8 +67,7 @@ namespace Marketplace.Services.AutoMapper
                     // IsInCart logic
                     if (!string.IsNullOrEmpty(userId) && role == "Customer")
                     {
-                        dest.IsInCart = src.Orders
-                            .Any(o => o.CustomerId == userId && o.Status == OrderStatus.InCart);
+                        dest.IsInCart = src.OrderItems.Any(o => o.Order.CustomerId == userId && o.Order.Status == OrderStatus.InCart);
                     }
                 });
 

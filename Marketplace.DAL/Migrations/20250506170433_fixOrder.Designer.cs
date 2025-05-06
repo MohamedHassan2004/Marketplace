@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marketplace.DAL.Migrations
 {
     [DbContext(typeof(MarketplaceDbContext))]
-    [Migration("20250505203754_refreshToken")]
-    partial class refreshToken
+    [Migration("20250506170433_fixOrder")]
+    partial class fixOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,9 +98,6 @@ namespace Marketplace.DAL.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ShippingAddress")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -118,8 +115,6 @@ namespace Marketplace.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("VendorId");
 
@@ -575,10 +570,6 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Marketplace.DAL.Models.Product", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("ProductId");
-
                     b.HasOne("Marketplace.DAL.Models.Users.Vendor", null)
                         .WithMany("Orders")
                         .HasForeignKey("VendorId");
@@ -595,7 +586,7 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Marketplace.DAL.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -765,7 +756,7 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.DAL.Models.Product", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderItems");
 
                     b.Navigation("SavedProducts");
                 });

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Marketplace.DAL.Enums;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
 using Marketplace.Services.DTOs.Product;
@@ -41,7 +42,7 @@ namespace Marketplace.Services.Service
                     CategoryName = savedProduct.Product.Category.Name,
                     VendorId = savedProduct.Product.VendorId,
                     VendorName = savedProduct.Product.Vendor.UserName,
-                    IsInCart = savedProduct.Product.OrderItems.Any(o => o.Order.CustomerId == userId && o.Order.Status == OrderStatus.InCart)
+                    IsInCart = savedProduct.Product.OrderItems.Any(o => o.Order.CustomerId == customerId && o.Order.Status == OrderStatus.InCart)
                 };
                 productDtos.Add(dto);
             }

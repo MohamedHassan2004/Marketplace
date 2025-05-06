@@ -29,7 +29,8 @@ namespace Marketplace.DAL.Repository
                 .Include(p => p.Category)
                 .Include(p => p.Vendor)
                 .Include(p => p.AdminChecked)
-                .Include(p => p.SavedProducts);
+                .Include(p => p.SavedProducts)
+                .Include(p => p.OrderItems);
         }
 
 
