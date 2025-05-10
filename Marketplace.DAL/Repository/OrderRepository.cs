@@ -21,7 +21,7 @@ namespace Marketplace.DAL.Repository
         {
             return await _dbContext.Orders
                     .Where(o => o.CustomerId == customerId && o.Status == OrderStatus.Completed)
-                    .ToListAsync();
+                    .AsNoTracking().ToListAsync();
         }
 
         public async Task<Order> GetInCartOrderByCustomerAsync(string customerId)

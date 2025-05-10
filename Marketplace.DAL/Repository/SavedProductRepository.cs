@@ -20,6 +20,7 @@ namespace Marketplace.DAL.Repository
                     .ThenInclude(p => p.Category)
                 .Include(sp => sp.Product)
                     .ThenInclude(p => p.Vendor)
+                .AsNoTracking()
                 .ToListAsync();
         }
 

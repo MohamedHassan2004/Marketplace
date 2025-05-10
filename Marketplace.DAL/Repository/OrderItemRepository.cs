@@ -29,6 +29,7 @@ namespace Marketplace.DAL.Repository
                 .Include(oi => oi.Order)
                 .ThenInclude(o => o.Customer)
                 .Where(oi => oi.Order.Status == OrderStatus.Completed && oi.ProductId == productId)
+                .AsNoTracking()
                 .ToListAsync();
         }
     }

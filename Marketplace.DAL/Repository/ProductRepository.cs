@@ -20,7 +20,8 @@ namespace Marketplace.DAL.Repository
             return _dbContext.Products
                 .Include(p => p.Category)
                 .Include(p => p.Vendor)
-                .Include(p => p.AdminChecked);
+                .Include(p => p.AdminChecked)
+                .AsNoTracking();
         }
         private IQueryable<Product> GetAcceptedProductQuery()
         {
@@ -30,7 +31,9 @@ namespace Marketplace.DAL.Repository
                 .Include(p => p.Vendor)
                 .Include(p => p.AdminChecked)
                 .Include(p => p.SavedProducts)
-                .Include(p => p.OrderItems);
+                .Include(p => p.OrderItems)
+                .AsNoTracking()
+;
         }
 
 

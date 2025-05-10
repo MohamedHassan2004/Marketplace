@@ -28,6 +28,7 @@ namespace Marketplace.DAL.Repository
             return await _context.Notifications
                 .Where(n => n.UserId == userId)
                 .OrderByDescending(n => n.CreatedAt)
+                .AsNoTracking()
                 .ToListAsync();
         }
 

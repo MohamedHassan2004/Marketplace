@@ -16,7 +16,7 @@ namespace Marketplace.DAL.Repository
 
         public async Task<IEnumerable<Permission>> GetAllPermissionsAsync()
         {
-            return await context.Permissions.ToListAsync();
+            return await context.Permissions.AsNoTracking().ToListAsync();
         }
 
         public async Task<Permission> GetPermissionByIdAsync(int id)

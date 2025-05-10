@@ -17,7 +17,7 @@ namespace Marketplace.DAL.Repository
 
         public async Task<IEnumerable<Vendor>> GetAllVendorsAsync()
         {
-            return await _dbContext.Vendors.ToListAsync();
+            return await _dbContext.Vendors.AsNoTracking().ToListAsync();
         }
 
         public async Task<Vendor> GetVendorByIdAsync(string vendorId)
@@ -27,7 +27,7 @@ namespace Marketplace.DAL.Repository
 
         public async Task<IEnumerable<Vendor>> GetWaitingVendorsAsync()
         {
-            return await _dbContext.Vendors.Where(v => v.ApprovalStatus == ApprovalStatus.Pending).ToListAsync();
+            return await _dbContext.Vendors.Where(v => v.ApprovalStatus == ApprovalStatus.Pending).AsNoTracking().ToListAsync();
         }
 
         public async Task<bool> UpdateVendorAsync(Vendor vendor)
@@ -35,7 +35,5 @@ namespace Marketplace.DAL.Repository
             _dbContext.Vendors.Update(vendor);
             return await _dbContext.SaveChangesAsync() > 0;
         }
-
-
     }
 }

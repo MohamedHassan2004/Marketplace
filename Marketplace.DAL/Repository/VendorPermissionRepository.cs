@@ -35,6 +35,7 @@ namespace Marketplace.DAL.Repository
             return await _dbContext.VendorPermissions
                 .Include(vp => vp.Permission)
                 .Where(vp => vp.VendorId == vendorId)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
