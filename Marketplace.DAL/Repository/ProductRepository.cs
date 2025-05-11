@@ -32,6 +32,7 @@ namespace Marketplace.DAL.Repository
                 .Include(p => p.AdminChecked)
                 .Include(p => p.SavedProducts)
                 .Include(p => p.OrderItems)
+                    .ThenInclude(oi => oi.Order)
                 .AsNoTracking()
 ;
         }

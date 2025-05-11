@@ -79,7 +79,6 @@ namespace Marketplace.Controllers
             return Ok(new { message = "Image updated successfully" });
         }
 
-        [Authorize(Roles = "Vendor")]
         [HttpGet("{productId}/history")]
         [RequirePermission(Permissions.ViewProductHistory)]
         public async Task<ActionResult<IEnumerable<ProductHistoryDto>>> GetProductHistory(int productId)
