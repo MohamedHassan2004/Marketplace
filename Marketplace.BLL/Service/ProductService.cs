@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Marketplace.BLL.Helper;
 using Marketplace.DAL.Enums;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
@@ -38,39 +39,6 @@ namespace Marketplace.Services.Service
             });
         }
 
-        private void DeleteImage(string ImgUrl)
-        {
-            if (!string.IsNullOrEmpty(ImgUrl))
-            {
-                var imagePath = Path.Combine(_env.WebRootPath, ImgUrl.TrimStart('/'));
-                if (File.Exists(imagePath))
-                    File.Delete(imagePath);
-            }
-        }
-
-        private string GenerateFileName(string originalFileName)
-        {
-            return Guid.NewGuid().ToString() + Path.GetExtension(originalFileName);
-        }
-
-        private string GetFilePath(string fileName)
-        {
-            var folderPath = Path.Combine(_env.WebRootPath, "images/products");
-
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            return Path.Combine(folderPath, fileName);
-        }
-
-        private async Task SaveImageToFileSystemAsync(IFormFile image, string filePath)
-        {
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(stream);
-            }
-        }
-
         private async Task CheckAutoApprovalPermissionForProductAsync(string vendorId, Product productEntity)
         {
             try
@@ -87,7 +55,7 @@ namespace Marketplace.Services.Service
             }
         }
 
-        private static Product CreateProductEntity(ProductCreateDto dto, string vendorId, string fileName)
+        private static Product CreateProductEntity(ProductCreateDto dto, string vendorId, string uploadImage)
         {
             return new Product()
             {
@@ -97,20 +65,15 @@ namespace Marketplace.Services.Service
                 Price = dto.Price,
                 Quantity = dto.Quantity,
                 CategoryId = dto.CategoryId,
-                ImageUrl = Path.Combine("images/products", fileName).Replace("\\", "/")
+                ImageUrl = uploadImage
             };
         }
 
         public async Task<bool> AddProductAsync(ProductCreateDto dto, string vendorId)
         {
-            if (dto.Image == null || dto.Image.Length == 0)
-                throw new ArgumentException("Image is required");
+            var uploadImage = await ImageProcessing.UploadImageAsync(dto.Image, "products", _env);
 
-            var fileName = GenerateFileName(dto.Image.FileName);
-            var filePath = GetFilePath(fileName);
-
-            await SaveImageToFileSystemAsync(dto.Image, filePath);
-            Product productEntity = CreateProductEntity(dto, vendorId, fileName);
+            Product productEntity = CreateProductEntity(dto, vendorId, uploadImage);
             await CheckAutoApprovalPermissionForProductAsync(vendorId, productEntity);
 
             return await _productRepository.AddAsync(productEntity);
@@ -122,7 +85,7 @@ namespace Marketplace.Services.Service
             if (product == null)
                 return false;
 
-            DeleteImage(product.ImageUrl);
+            ImageProcessing.DeleteImage(product.ImageUrl,_env);
 
             return await _productRepository.DeleteByIdAsync(id);
         }
@@ -133,13 +96,8 @@ namespace Marketplace.Services.Service
             if (product == null || newImg == null || newImg.Length == 0)
                 return false;
 
-            DeleteImage(product.ImageUrl);
+            product.ImageUrl = ImageProcessing.UpdateImageAsync(product.ImageUrl, newImg, "products", _env).Result;
 
-            var fileName = GenerateFileName(newImg.FileName);
-            var filePath = GetFilePath(fileName);
-            await SaveImageToFileSystemAsync(newImg, filePath);
-
-            product.ImageUrl = $"/images/products/{fileName}";
             await _productRepository.UpdateAsync(product);
 
             return true;
@@ -170,7 +128,7 @@ namespace Marketplace.Services.Service
             var historyDto = orderItems.Select(item => new ProductHistoryDto
             {
                 CustomerId = item.Order.CustomerId,
-                CustomerName = item.Order.Customer.UserName,
+                CustomerName = item.Order.Customer?.UserName ?? "Unknown",
                 Quantity = item.Quantity,
                 OrderedAt = item.Order.ConfirmedAt ?? DateTime.MinValue
             });

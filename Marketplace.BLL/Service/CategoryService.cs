@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Marketplace.BLL.Helper;
 using Marketplace.DAL.IRepository;
 using Marketplace.DAL.Models;
 using Marketplace.DAL.Repository;
@@ -22,59 +23,16 @@ namespace Marketplace.Services.Service
             _env = env;
         }
 
-        private void DeleteImage(string ImgUrl)
-        {
-            if (!string.IsNullOrEmpty(ImgUrl))
-            {
-                var imagePath = Path.Combine(_env.WebRootPath, ImgUrl.TrimStart('/'));
-                if (File.Exists(imagePath))
-                    File.Delete(imagePath);
-            }
-        }
-
-        private string GenerateFileName(string originalFileName)
-        {
-            return Guid.NewGuid().ToString() + Path.GetExtension(originalFileName);
-        }
-
-        private string GetFilePath(string fileName)
-        {
-            var folderPath = Path.Combine(_env.WebRootPath, "images/categories");
-
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            return Path.Combine(folderPath, fileName);
-        }
-
-        private async Task SaveImageToFileSystemAsync(IFormFile image, string filePath)
-        {
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(stream);
-            }
-        }
-
-        private Category CreateCategoryEntity(string name, string fileName)
-        {
-            return new Category
-            {
-                Name = name,
-                ImgUrl = $"/images/categories/{fileName}"
-            };
-        }
 
         public async Task<bool> AddCategoryAsync(CategoryCreateDto dto)
         {
-            if (dto.Image == null || dto.Image.Length == 0)
-                throw new ArgumentException("Image is required");
+            var uploadImage = await ImageProcessing.UploadImageAsync(dto.Image, "categories", _env);
 
-            var fileName = GenerateFileName(dto.Image.FileName);
-            var filePath = GetFilePath(fileName);
-
-            await SaveImageToFileSystemAsync(dto.Image, filePath);
-
-            var category = CreateCategoryEntity(dto.Name, fileName);
+            var category = new Category
+            {
+                Name = dto.Name,
+                ImgUrl = uploadImage
+            };
 
             return await _categoryRepository.AddAsync(category);
         }
@@ -85,7 +43,7 @@ namespace Marketplace.Services.Service
             if (category == null)
                 return false;
 
-            DeleteImage(category.ImgUrl);
+            ImageProcessing.DeleteImage(category.ImgUrl,_env);
 
             return await _categoryRepository.DeleteByIdAsync(category.Id);
         }
@@ -108,10 +66,9 @@ namespace Marketplace.Services.Service
         }
 
 
-        private void UpdateCategoryImage(Category category, string newFileName)
+        private void UpdateCategoryImage(Category category, CategoryCreateDto dto)
         {
-            DeleteImage(category.ImgUrl);
-            category.ImgUrl = $"/images/categories/{newFileName}";
+            category.ImgUrl = ImageProcessing.UpdateImageAsync(category.ImgUrl, dto.Image, "categories", _env).Result;
         }
 
         public async Task<bool> UpdateCategoryAsync(int id, CategoryCreateDto dto)
@@ -124,12 +81,7 @@ namespace Marketplace.Services.Service
 
             if (dto.Image?.Length > 0)
             {
-                var fileName = GenerateFileName(dto.Image.FileName);
-                var filePath = GetFilePath(fileName);
-
-                await SaveImageToFileSystemAsync(dto.Image, filePath);
-
-                UpdateCategoryImage(category, fileName);
+                UpdateCategoryImage(category, dto);
             }
 
             return await _categoryRepository.UpdateAsync(category);
