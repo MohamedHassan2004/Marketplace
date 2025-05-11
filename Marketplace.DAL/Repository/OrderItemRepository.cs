@@ -16,6 +16,14 @@ namespace Marketplace.DAL.Repository
             _dbContext = context;
         }
 
+        public new async Task<IEnumerable<OrderItem>> GetAllAsync()
+        {
+            return await _dbContext.OrderItems
+                .Include(oi => oi.Product)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public new async Task<OrderItem> GetByIdAsync(int id)
         {
             return await _dbContext.OrderItems
