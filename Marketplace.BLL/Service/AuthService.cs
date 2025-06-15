@@ -81,8 +81,6 @@ namespace Marketplace.BLL.Service
             if (existingUser != null)
                 return RegisterResult.Fail("Username already exists.");
 
-            registerDto.PhoneNumber = _protector.Protect(registerDto.PhoneNumber);
-
             ApplicationUser user = registerDto.Role switch
             {
                 "Vendor" => new Vendor { UserName = registerDto.Username, Email = registerDto.Email, PhoneNumber = registerDto.PhoneNumber },
@@ -102,10 +100,6 @@ namespace Marketplace.BLL.Service
             }
 
             await _userManager.AddToRoleAsync(user, registerDto.Role);
-
-
-            _logger.LogInformation($"Getting phone number: {user.PhoneNumber}");
-            _logger.LogInformation($"Getting phone number: {_protector.Unprotect(user.PhoneNumber)}");
 
             return RegisterResult.Success("", user.Id);
         }

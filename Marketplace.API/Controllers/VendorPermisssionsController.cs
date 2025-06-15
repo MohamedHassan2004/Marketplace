@@ -63,7 +63,7 @@ namespace Marketplace.API.Controllers
                 return NotFound(new { Message = "Permission not found or already removed." });
 
             // send notificatioin
-            var permissionName = Enum.GetName(typeof(Permissions), id);
+            var permissionName = Enum.GetName(typeof(Permissions), vendorPermission.PermissionId);
             await _notificationService.SendNotificationAsync(vendorPermission.VendorId, $"Now You don't have this permission: {permissionName}.");
 
             return Ok(new { Message = "Permission removed from vendor successfully." });
